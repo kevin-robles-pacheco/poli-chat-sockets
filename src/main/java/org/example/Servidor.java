@@ -2,100 +2,130 @@ package org.example;
 
 import java.net.*;
 import java.io.*;
-import java.util.Scanner;
-
-import static org.example.App.mostrarTexto;
-
+import java.util.*;
 
 public class Servidor {
 
-    private Socket socket;
-    private ServerSocket serverSocket;
-    private DataInputStream bufferDeEntrada = null;
-    private DataOutputStream bufferDeSalida = null;
-    Scanner escaner = new Scanner(System.in);
-    final String COMANDO_TERMINACION = "salir()";
+    private final List<ClientHandler> clientes = new ArrayList<>();
+    final String COMANDO_TERMINACION = "chao";
 
-    public void levantarConexion(int puerto) {
+    public static void main(String[] args) {
+        Servidor servidor = new Servidor();
+        Scanner sc = new Scanner(System.in);
+
+        mostrarTexto("Ingresa la IP en el formato [127.0.0.1 por defecto]: ");
+        String ip = sc.nextLine();
+        if (ip.length() <= 0) ip = "127.0.0.1";
+
+        mostrarTexto("Ingresa el puerto [5050 por defecto]: ");
+        String puerto = sc.nextLine();
+        if (puerto.length() <= 0) puerto = "5050";
+
+        servidor.iniciarServidor(ip, Integer.parseInt(puerto));
+    }
+
+    public static void mostrarTexto(String s) {
+        System.out.println(s);
+    }
+
+    public void iniciarServidor(String ip, int puerto) {
         try {
-            serverSocket = new ServerSocket(puerto);
-            mostrarTexto("Esperando conexión entrante en el puerto " + String.valueOf(puerto) + "...");
-            socket = serverSocket.accept();
-            mostrarTexto("Conexión establecida con: " + socket.getInetAddress().getHostName() + "\n\n\n");
-        } catch (Exception e) {
-            mostrarTexto("Error en levantarConexion(): " + e.getMessage());
-            System.exit(0);
-        }
-    }
-    public void flujos() {
-        try {
-            bufferDeEntrada = new DataInputStream(socket.getInputStream());
-            bufferDeSalida = new DataOutputStream(socket.getOutputStream());
-            bufferDeSalida.flush();
-        } catch (IOException e) {
-            mostrarTexto("Error en la apertura de flujos");
-        }
-    }
+            ServerSocket serverSocket = new ServerSocket(puerto, 0, InetAddress.getByName(ip));
+            mostrarTexto("Servidor iniciado en " + ip + ":" + puerto);
 
-    public void recibirDatos() {
-        String st = "";
-        try {
-            do {
-                st = (String) bufferDeEntrada.readUTF();
-                mostrarTexto("\n[Cliente] => " + st);
-                System.out.print("\n[Usted] => ");
-            } while (!st.equals(COMANDO_TERMINACION));
-        } catch (IOException e) {
-            cerrarConexion();
-        }
-    }
-
-
-    public void enviar(String s) {
-        try {
-            bufferDeSalida.writeUTF(s);
-            bufferDeSalida.flush();
-        } catch (IOException e) {
-            mostrarTexto("Error en enviar(): " + e.getMessage());
-        }
-    }
-
-    public void escribirDatos() {
-        while (true) {
-            System.out.print("[Usted] => ");
-            enviar(escaner.nextLine());
-        }
-    }
-
-    public void cerrarConexion() {
-        try {
-            bufferDeEntrada.close();
-            bufferDeSalida.close();
-            socket.close();
-        } catch (IOException e) {
-            mostrarTexto("Excepción en cerrarConexion(): " + e.getMessage());
-        } finally {
-            mostrarTexto("Conversación finalizada....");
-            System.exit(0);
-
-        }
-    }
-
-    public void ejecutarConexion(int puerto) {
-        Thread hilo = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        levantarConexion(puerto);
-                        flujos();
-                        recibirDatos();
-                    } finally {
-                        cerrarConexion();
-                    }
-                }
+            while (true) {
+                Socket socket = serverSocket.accept();
+                ClientHandler cliente = new ClientHandler(socket, this);
+                clientes.add(cliente);
+                cliente.start();
             }
-        });
-        hilo.start();
+        } catch (IOException e) {
+            mostrarTexto("Error al iniciar el servidor: " + e.getMessage());
+        }
+    }
+
+    // Enviar mensaje a todos los clientes conectados
+    public synchronized void enviarMensajeATodos(String mensaje, ClientHandler emisor) {
+        for (ClientHandler cliente : clientes) {
+            if (cliente != emisor) {
+                cliente.enviarMensaje(mensaje);
+            }
+        }
+    }
+
+    // Remover cliente de la lista al desconectarse
+    public synchronized void removerCliente(ClientHandler cliente) {
+        clientes.remove(cliente);
+        mostrarTexto("El usuario : " + cliente.getNombreUsuario() + " se desconecto.");
+    }
+
+    // Clase interna para manejar a cada cliente de forma independiente
+    private class ClientHandler extends Thread {
+        private final Socket socket;
+        private DataInputStream entrada;
+        private DataOutputStream salida;
+        private final Servidor servidor;
+        private String nombreUsuario;
+
+        public ClientHandler(Socket socket, Servidor servidor) {
+            this.socket = socket;
+            this.servidor = servidor;
+        }
+
+        public String getNombreUsuario() {
+            return nombreUsuario;
+        }
+
+        @Override
+        public void run() {
+            try {
+                entrada = new DataInputStream(socket.getInputStream());
+                salida = new DataOutputStream(socket.getOutputStream());
+
+                // Recibir el nombre de usuario al conectarse
+                nombreUsuario = entrada.readUTF();
+                mostrarTexto(nombreUsuario + " se ha conectado.");
+
+                // Notificar a otros clientes sobre la nueva conexión
+                servidor.enviarMensajeATodos(nombreUsuario + " se ha unido al chat.", this);
+
+                // Manejar mensajes de chat
+                String mensaje;
+                while (true) {
+                    mensaje = entrada.readUTF();
+                    if (mensaje.equalsIgnoreCase(COMANDO_TERMINACION)) {
+                        mostrarTexto(nombreUsuario + " se ha desconectado.");
+                        servidor.enviarMensajeATodos(nombreUsuario + " ha salido del chat.", this);
+                        break;
+                    }
+                    mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+                    servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, this);
+                }
+            } catch (IOException e) {
+                mostrarTexto("Error en la conexión con el cliente: " + e.getMessage());
+            } finally {
+                servidor.removerCliente(this);
+                cerrarConexion();
+            }
+        }
+
+        public void enviarMensaje(String mensaje) {
+            try {
+                salida.writeUTF(mensaje);
+                salida.flush();
+            } catch (IOException e) {
+                mostrarTexto("Error al enviar mensaje a " + nombreUsuario + ": " + e.getMessage());
+            }
+        }
+
+        public void cerrarConexion() {
+            try {
+                if (entrada != null) entrada.close();
+                if (salida != null) salida.close();
+                if (socket != null) socket.close();
+            } catch (IOException e) {
+                mostrarTexto("Error al cerrar conexión: " + e.getMessage());
+            }
+        }
     }
 }
