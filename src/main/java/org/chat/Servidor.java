@@ -1,4 +1,4 @@
-package org.example;
+package org.chat;
 
 import java.net.*;
 import java.io.*;

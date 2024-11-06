@@ -1,4 +1,4 @@
-package org.example;
+package org.chat;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
