@@ -7,14 +7,16 @@ public class HistoricoDTO {
     private Date emphistFechaRetiro;
     private int emphistCargoId;
     private int emphistDptoId;
+    private int emphistEmpId;
 
     public HistoricoDTO() {}
 
-    public HistoricoDTO(int emphistId, Date emphistFechaRetiro, int emphistCargoId, int emphistDptoId) {
+    public HistoricoDTO(int emphistId, Date emphistFechaRetiro, int emphistCargoId, int emphistDptoId, int emphistEmpId) {
         this.emphistId = emphistId;
         this.emphistFechaRetiro = emphistFechaRetiro;
         this.emphistCargoId = emphistCargoId;
         this.emphistDptoId = emphistDptoId;
+        this.emphistEmpId = emphistEmpId;
     }
 
     public int getEmphistId() {
@@ -47,5 +49,13 @@ public class HistoricoDTO {
 
     public void setEmphistDptoId(int emphistDptoId) {
         this.emphistDptoId = emphistDptoId;
+    }
+
+    public int getEmphistEmpId() {
+        return emphistEmpId;
+    }
+
+    public void setEmphistEmpId(int emphistEmpId) {
+        this.emphistEmpId = emphistEmpId;
     }
 }
