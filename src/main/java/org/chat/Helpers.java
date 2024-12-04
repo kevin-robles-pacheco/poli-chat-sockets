@@ -1,8 +1,6 @@
 package org.chat;
 
-import org.chat.DTO.CiudadDTO;
-import org.chat.DTO.EmpleadoDTO;
-import org.chat.DTO.PaisDTO;
+import org.chat.DTO.*;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -12,24 +10,24 @@ import static org.chat.Servidor.mostrarTexto;
 
 public class Helpers {
 
-    public void listadoDeOpciones(Servidor servidor, Servidor.ClientHandler cliente){
-        servidor.enviarMensajeATodos("Por favor digite el numero con la acción que desea realizar: \n"+
-                "1. Ingresar al Chat\n"+
-                "2. Insertar Datos\n"+
-                "3. Consultar Empleados\n"+
-                "4. Eliminar Empleados\n"+
-                "0. Regresar\n",
+    public void listadoDeOpciones(Servidor servidor, Servidor.ClientHandler cliente) {
+        servidor.enviarMensajeATodos("Por favor digite el numero con la acción que desea realizar: \n" +
+                        "1. Ingresar al Chat\n" +
+                        "2. Insertar Datos\n" +
+                        "3. Consultar Empleados\n" +
+                        "4. Eliminar Empleados\n" +
+                        "0. Regresar\n",
                 cliente);
     }
 
     public void mostrarOpciones(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
         String mensaje = "";
-        do{
+        do {
             listadoDeOpciones(servidor, cliente);
             mensaje = entrada.readUTF();
 
-            if(!mensaje.isEmpty()) {
-                switch (mensaje){
+            if (!mensaje.isEmpty()) {
+                switch (mensaje) {
                     case "1":
                         break;
                     case "2":
@@ -54,8 +52,8 @@ public class Helpers {
             listadoDeOpcionesInsertarDatos(servidor, cliente);
             mensaje = entrada.readUTF();
 
-            if(!mensaje.isEmpty()) {
-                switch (mensaje){
+            if (!mensaje.isEmpty()) {
+                switch (mensaje) {
                     case "1":
                         crearPais(servidor, cliente, entrada, nombreUsuario);
                         break;
@@ -63,10 +61,10 @@ public class Helpers {
                         crearCiudad(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "3":
-                        crearLocalizacion();
+                        crearLocalizacion(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "4":
-                        crearDepartamento();
+                        crearDepartamento(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "5":
                         crearCargo(servidor, cliente, entrada, nombreUsuario);
@@ -81,15 +79,15 @@ public class Helpers {
         } while (!"0".equals(mensaje));
     }
 
-    public void listadoDeOpcionesInsertarDatos(Servidor servidor, Servidor.ClientHandler cliente){
-        servidor.enviarMensajeATodos("Ahora digite el número con la acción que desea realizar: \n"+
-                "1. Insertar Pais\n"+
-                "2. Insertar Ciudad\n"+
-                "3. Insertar Localización\n"+
-                "4. Insertar Departamento\n"+
-                "5. Insertar Cargo\n"+
-                "6. Insertar Empleado\n"+
-                "0. Regresar\n",
+    public void listadoDeOpcionesInsertarDatos(Servidor servidor, Servidor.ClientHandler cliente) {
+        servidor.enviarMensajeATodos("Ahora digite el número con la acción que desea realizar: \n" +
+                        "1. Insertar Pais\n" +
+                        "2. Insertar Ciudad\n" +
+                        "3. Insertar Localización\n" +
+                        "4. Insertar Departamento\n" +
+                        "5. Insertar Cargo\n" +
+                        "6. Insertar Empleado\n" +
+                        "0. Regresar\n",
                 cliente
         );
     }
@@ -107,11 +105,11 @@ public class Helpers {
         PaisDB PaisDB = new PaisDB(con);
 
         if (PaisDB.insertarPais(PaisDTO)) {
-            servidor.enviarMensajeATodos("Empleado insertado correctamente.", cliente);
-            mensaje = "Empleado creado con exito";
+            servidor.enviarMensajeATodos("Pais insertado correctamente.", cliente);
+            mensaje = "Pais creado con exito";
         } else {
-            servidor.enviarMensajeATodos("Error al insertar empleado.", cliente);
-            mensaje = "Error al insertar empleado.";
+            servidor.enviarMensajeATodos("Error al insertar Pais.", cliente);
+            mensaje = "Error al insertar Pais.";
         }
         mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
         servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
@@ -143,15 +141,86 @@ public class Helpers {
         servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
     }
 
-    public void crearLocalizacion(){
+    public void crearLocalizacion(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
+        String mensaje;
+        LocalizacionDTO LocalizacionDTO = new LocalizacionDTO();
+
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] acción => Crear Localización", cliente);
+
+        servidor.enviarMensajeATodos("Ingrese la dirección de la localización: ", cliente);
+        LocalizacionDTO.setLocalizDireccion(entrada.readUTF());
+
+        servidor.enviarMensajeATodos("Ingrese la Ciudad id de la localización: ", cliente);
+        LocalizacionDTO.setLocalizCiudadId(Integer.parseInt(entrada.readUTF()));
+
+        Connection con = DataBase.establecerConexion();
+        LocalizacionDB LocalizacionDB = new LocalizacionDB(con);
+
+        if (LocalizacionDB.insertarLocalizacion(LocalizacionDTO)) {
+            servidor.enviarMensajeATodos("Localización insertada correctamente.", cliente);
+            mensaje = "Localización creada con exito";
+        } else {
+            servidor.enviarMensajeATodos("Error al insertar localización.", cliente);
+            mensaje = "Error al insertar localización.";
+        }
+        mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
 
     }
 
-    public void crearDepartamento(){
+    public void crearDepartamento(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
+        String mensaje;
+        DepartamentoDTO departamentoDTO = new DepartamentoDTO();
 
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] acción => Crear Departamento", cliente);
+
+        servidor.enviarMensajeATodos("Ingrese el nombre del departamento: ", cliente);
+        departamentoDTO.setDptoNombre(entrada.readUTF());
+
+        servidor.enviarMensajeATodos("Ingrese el ID de la localización: ", cliente);
+        departamentoDTO.setDptoLocalizId(Integer.parseInt(entrada.readUTF()));
+
+        Connection con = DataBase.establecerConexion();
+        DepartamentoDB departamentoDB = new DepartamentoDB(con);
+
+        if (departamentoDB.insertarDepartamento(departamentoDTO)) {
+            servidor.enviarMensajeATodos("Departamento insertado correctamente.", cliente);
+            mensaje = "Departamento creado con exito";
+        } else {
+            servidor.enviarMensajeATodos("Error al insertar departamento.", cliente);
+            mensaje = "Error al insertar departamento.";
+        }
+        mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
     }
 
-    public void crearCargo(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario){
+    public void crearCargo(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
+        String mensaje;
+        CargoDTO cargoDTO = new CargoDTO();
+
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] acción => Crear Cargo", cliente);
+
+        servidor.enviarMensajeATodos("Ingrese el nombre del cargo: ", cliente);
+        cargoDTO.setCargoNombre(entrada.readUTF());
+
+        servidor.enviarMensajeATodos("Ingrese el sueldo mínimo: ", cliente);
+        cargoDTO.setCargoSueldoMinimo(Double.parseDouble(entrada.readUTF()));
+
+        servidor.enviarMensajeATodos("Ingrese el sueldo máximo: ", cliente);
+        cargoDTO.setCargoSueldoMaximo(Double.parseDouble(entrada.readUTF()));
+
+        Connection con = DataBase.establecerConexion();
+        CargoDB cargoDB = new CargoDB(con);
+
+        if (cargoDB.insertarCargo(cargoDTO)) {
+            servidor.enviarMensajeATodos("Cargo insertado correctamente.", cliente);
+            mensaje = "Cargo creado con exito";
+        } else {
+            servidor.enviarMensajeATodos("Error al insertar cargo.", cliente);
+            mensaje = "Error al insertar cargo.";
+        }
+        mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
 
     }
 

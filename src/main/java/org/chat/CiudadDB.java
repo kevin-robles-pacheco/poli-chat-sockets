@@ -16,7 +16,7 @@ public class CiudadDB {
     final String cityTable = "CIUDADES";
     public boolean insertarCiudad(CiudadDTO CiudadDTO) {
         try {
-            String createTableQuery = "CREATE TABLE IF NOT EXISTS " + cityTable + " (ciud_id INT PRIMARY KEY AUTO_INCREMENT, ciud_nombre VARCHAR(255) NOT NULL, ciud_pais_id INT NOT NULL)";
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS " + cityTable + " (ciud_id INT PRIMARY KEY AUTO_INCREMENT, ciud_nombre VARCHAR(255) NOT NULL, ciud_pais_id INT NOT NULL, FOREIGN KEY (ciud_pais_id) REFERENCES PAISES(pais_id))";
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(createTableQuery);
             String insertQuery = "INSERT INTO " + cityTable + " (ciud_nombre, ciud_pais_id) VALUES ('" + CiudadDTO.getCiudNombre() + "', '" + CiudadDTO.getCiudPaisId() + "')";
