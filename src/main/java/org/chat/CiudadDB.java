@@ -19,7 +19,7 @@ public class CiudadDB {
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + cityTable + " (ciud_id INT PRIMARY KEY AUTO_INCREMENT, ciud_nombre VARCHAR(255) NOT NULL, ciud_pais_id INT NOT NULL)";
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(createTableQuery);
-            String insertQuery = "INSERT INTO " + cityTable + " VALUES ('" + CiudadDTO.getCiudNombre() + "', '" + CiudadDTO.getCiudPaisId() + "')";
+            String insertQuery = "INSERT INTO " + cityTable + " (ciud_nombre, ciud_pais_id) VALUES ('" + CiudadDTO.getCiudNombre() + "', '" + CiudadDTO.getCiudPaisId() + "')";
             stmt.executeUpdate(insertQuery);
             return true;
         } catch (Exception e) {

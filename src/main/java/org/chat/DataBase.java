@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import static org.chat.Servidor.mostrarTexto;
 
 public class DataBase {
-    static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
+    static final String URL = "jdbc:mysql://localhost:3306/finance-app";
     static final String USER = "root";
     static final String PASSWORD = "rootpassword";
 
