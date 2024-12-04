@@ -21,6 +21,7 @@ public class Helpers {
                 "0. Regresar\n",
                 cliente);
     }
+
     public void mostrarOpciones(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
         String mensaje = "";
         do{

@@ -7,9 +7,10 @@ import java.sql.SQLException;
 import static org.chat.Servidor.mostrarTexto;
 
 public class DataBase {
+
+    static final String URL = "jdbc:mysql://localhost:3306/finance-app";
     static final String USER = "root";
     static final String PASSWORD = "rootpassword";
-    static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=DATOS;encrypt=true;trustServerCertificate=true";
 
     public static Connection establecerConexion() {
         Connection conn = null;

@@ -18,7 +18,7 @@ public class PaisDB {
             String createTableQuery = "CREATE TABLE IF NOT EXISTS PAISES (pais_id INT PRIMARY KEY AUTO_INCREMENT, pais_nombre VARCHAR(255) NOT NULL)";
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(createTableQuery);
-            String insertQuery = "INSERT INTO PAISES VALUES ('" + PaisDTO.getNombre() + "')";
+            String insertQuery = "INSERT INTO PAISES (pais_nombre) VALUES ('" + PaisDTO.getNombre() + "')";
             stmt.executeUpdate(insertQuery);
             return true;
         } catch (Exception e) {
