@@ -1,6 +1,8 @@
 package org.chat;
 
+import org.chat.DTO.CiudadDTO;
 import org.chat.DTO.EmpleadoDTO;
+import org.chat.DTO.PaisDTO;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -54,10 +56,10 @@ public class Helpers {
             if(!mensaje.isEmpty()) {
                 switch (mensaje){
                     case "1":
-                        crearPais();
+                        crearPais(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "2":
-                        crearCiudad();
+                        crearCiudad(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "3":
                         crearLocalizacion();
@@ -91,12 +93,53 @@ public class Helpers {
         );
     }
 
-    public void crearPais(){
+    public void crearPais(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
+        String mensaje;
+        PaisDTO PaisDTO = new PaisDTO();
 
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] acción => Crear Pais", cliente);
+
+        servidor.enviarMensajeATodos("Ingrese el nombre del país: ", cliente);
+        PaisDTO.setNombre(entrada.readUTF());
+
+        Connection con = DataBase.establecerConexion();
+        PaisDB PaisDB = new PaisDB(con);
+
+        if (PaisDB.insertarPais(PaisDTO)) {
+            servidor.enviarMensajeATodos("Empleado insertado correctamente.", cliente);
+            mensaje = "Empleado creado con exito";
+        } else {
+            servidor.enviarMensajeATodos("Error al insertar empleado.", cliente);
+            mensaje = "Error al insertar empleado.";
+        }
+        mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
     }
 
-    public void crearCiudad(){
+    public void crearCiudad(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
+        String mensaje;
+        CiudadDTO ciudadDTO = new CiudadDTO();
 
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] acción => Crear Ciudad", cliente);
+
+        servidor.enviarMensajeATodos("Ingrese el nombre de la ciudad: ", cliente);
+        ciudadDTO.setCiudNombre(entrada.readUTF());
+
+        servidor.enviarMensajeATodos("Ingrese el país ID de la ciudad: ", cliente);
+        ciudadDTO.setCiudPaisId(Integer.parseInt(entrada.readUTF()));
+
+        Connection con = DataBase.establecerConexion();
+        CiudadDB ciudadDB = new CiudadDB(con);
+
+        if (ciudadDB.insertarCiudad(ciudadDTO)) {
+            servidor.enviarMensajeATodos("Ciudad insertada correctamente.", cliente);
+            mensaje = "Ciudad creada con exito";
+        } else {
+            servidor.enviarMensajeATodos("Error al insertar ciudad.", cliente);
+            mensaje = "Error al insertar ciudad.";
+        }
+        mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
+        servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);
     }
 
     public void crearLocalizacion(){

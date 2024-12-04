@@ -1,22 +1,29 @@
 package org.chat.DTO;
 
 public class PaisDTO {
-    int id;
-    String nombre;
+    int paisId;
+    String paisNombre;
 
-    public int getId() {
-        return id;
+    public PaisDTO() {};
+
+    public PaisDTO(int paisId, String paisNombre) {
+        this.paisId = paisId;
+        this.paisNombre = paisNombre;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getPaisId() {
+        return paisId;
+    }
+
+    public void setPaisId(int paisId) {
+        this.paisId = paisId;
     }
 
     public String getNombre() {
-        return nombre;
+        return paisNombre;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombre(String paisNombre) {
+        this.paisNombre = paisNombre;
     }
 }
