@@ -68,7 +68,7 @@ public class Helpers {
                         crearDepartamento();
                         break;
                     case "5":
-                        crearCargo();
+                        crearCargo(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "6":
                         crearEmpleado(servidor, cliente, entrada, nombreUsuario);
@@ -150,7 +150,7 @@ public class Helpers {
 
     }
 
-    public void crearCargo(){
+    public void crearCargo(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario){
 
     }
 

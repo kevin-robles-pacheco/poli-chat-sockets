@@ -7,19 +7,20 @@ import java.sql.SQLException;
 import static org.chat.Servidor.mostrarTexto;
 
 public class DataBase {
-    static final String USER = "sa";
-    static final String PASSWORD = "";
+    static final String USER = "root";
+    static final String PASSWORD = "rootpassword";
     static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=DATOS;encrypt=true;trustServerCertificate=true";
 
-
     public static Connection establecerConexion() {
+        Connection conn = null;
         try {
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
             mostrarTexto("Error al conectar a la base de datos: " + e.getMessage());
         }
-        return null;
+        return conn;
     }
+
     public void cerrarConexion(Connection con) {
         try {
             if (con != null && !con.isClosed()) {
