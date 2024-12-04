@@ -11,12 +11,13 @@ import static org.chat.Servidor.mostrarTexto;
 
 public class EmpleadoDB {
     Connection conn;
+    String employeTable = "EMPLEADOS";
     public EmpleadoDB(Connection conn){
         this.conn = conn;
     }
     public boolean insertarEmpleado(EmpleadoDTO empleadoDTO) {
         try {
-            String createTableQuery = "CREATE TABLE IF NOT EXISTS empleados (" +
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS " + employeTable + " (" +
                     "empl_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "empl_primer_nombre VARCHAR(50), " +
                     "empl_segundo_nombre VARCHAR(50), " +
@@ -34,7 +35,7 @@ public class EmpleadoDB {
             String fechaNAc = empleadoDTO.getEmplFechaNac();
             Date convertedCurrentDate = sdf.parse(fechaNAc);
 
-            String insertQuery = "INSERT INTO empleados (empl_primer_nombre, empl_segundo_nombre, empl_email, empl_fecha_nac, empl_sueldo, empl_comision, empl_cargo_ID, empl_dpto_ID, empl_Gerente_ID) VALUES ('" +
+            String insertQuery = "INSERT INTO " + employeTable + " (empl_primer_nombre, empl_segundo_nombre, empl_email, empl_fecha_nac, empl_sueldo, empl_comision, empl_cargo_ID, empl_dpto_ID, empl_Gerente_ID) VALUES ('" +
                     empleadoDTO.getEmplPrimerNombre() + "', '" +
                     empleadoDTO.getEmplSegundoNombre() + "', '" +
                     empleadoDTO.getEmplEmail() + "', '" +

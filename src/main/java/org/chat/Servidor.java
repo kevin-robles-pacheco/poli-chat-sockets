@@ -112,7 +112,7 @@ public class Servidor {
 
                     if (mensaje.equalsIgnoreCase("menu")) {
                         Helpers helpers = new Helpers();
-                        helpers.listadoDeOpciones(servidor, this);
+                        helpers.mostrarOpciones(servidor, this, entrada, nombreUsuario);
                     }
                     mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
                     servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, this);

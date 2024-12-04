@@ -7,9 +7,10 @@ import java.sql.SQLException;
 import static org.chat.Servidor.mostrarTexto;
 
 public class DataBase {
-    static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
-    static final String USER = "root";
-    static final String PASSWORD = "rootpassword";
+    static final String USER = "sa";
+    static final String PASSWORD = "";
+    static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=DATOS;encrypt=true;trustServerCertificate=true";
+
 
     public static Connection establecerConexion() {
         try {
