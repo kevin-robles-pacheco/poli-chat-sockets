@@ -7,6 +7,7 @@ import org.chat.DTO.PaisDTO;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.List;
 
 import static org.chat.Servidor.mostrarTexto;
 
@@ -36,6 +37,7 @@ public class Helpers {
                         insertarDatos(servidor, cliente, entrada, nombreUsuario);
                         break;
                     case "3":
+                        consultarEmpleado(servidor, cliente, entrada);
                         break;
                     case "4":
                         break;
@@ -94,6 +96,40 @@ public class Helpers {
         );
     }
 
+    public void consultarEmpleado(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada) throws IOException {
+
+        Connection con = DataBase.establecerConexion();
+        EmpleadoDB empleadoDB = new EmpleadoDB(con);
+        List<EmpleadoDTO> empleados = empleadoDB.leerEmpleados();
+
+        if(empleados.isEmpty()){
+            servidor.enviarMensajeATodos("No hay empleados creados en base de datos: ", cliente);
+            return;
+        }
+
+        for (EmpleadoDTO empleadoDTO : empleados) {
+            servidor.enviarMensajeATodos("Empleado encontrado: ID: [" + empleadoDTO.getEmplId() + "] Nombre: " + empleadoDTO.getEmplPrimerNombre(), cliente);
+        }
+
+        String mensaje = "";
+        servidor.enviarMensajeATodos("Ingrese el ID del empleado a consultar: ", cliente);
+        mensaje = entrada.readUTF();
+
+        if(!mensaje.isEmpty()){
+            int idEmpleado = Integer.parseInt(mensaje);
+
+            EmpleadoDTO empleado = empleadoDB.obtenerEmpleado(idEmpleado);
+
+            if (empleado != null) {
+                servidor.enviarMensajeATodos("Empleado encontrado: " + empleado.getEmplPrimerNombre(), cliente);
+                servidor.enviarMensajeATodos("| ID  | Nombre  | Segundo Nombre | Email        | Fecha Nac   | Sueldo | Comision | Cargo | Dpto | Gerente | Historico |", cliente);
+                servidor.enviarMensajeATodos("| " + empleado.getEmplId() + "  | " + empleado.getEmplPrimerNombre() + "  | " + empleado.getEmplSegundoNombre() + " | " + empleado.getEmplEmail() + "  | Fecha Nac   | Sueldo | Comision | Cargo | Dpto | Gerente | Historico |", cliente);
+            } else {
+                servidor.enviarMensajeATodos("Empleado no encontrado.", cliente);
+            }
+        }
+    }
+
     public void crearPais(Servidor servidor, Servidor.ClientHandler cliente, DataInputStream entrada, String nombreUsuario) throws IOException {
         String mensaje;
         PaisDTO PaisDTO = new PaisDTO();
@@ -107,11 +143,11 @@ public class Helpers {
         PaisDB PaisDB = new PaisDB(con);
 
         if (PaisDB.insertarPais(PaisDTO)) {
-            servidor.enviarMensajeATodos("Empleado insertado correctamente.", cliente);
-            mensaje = "Empleado creado con exito";
+            servidor.enviarMensajeATodos("Pais insertado correctamente.", cliente);
+            mensaje = "Pais creado con exito";
         } else {
-            servidor.enviarMensajeATodos("Error al insertar empleado.", cliente);
-            mensaje = "Error al insertar empleado.";
+            servidor.enviarMensajeATodos("Error al insertar Pais.", cliente);
+            mensaje = "Error al insertar Pais.";
         }
         mostrarTexto("[" + nombreUsuario + "] => " + mensaje);
         servidor.enviarMensajeATodos("[" + nombreUsuario + "] => " + mensaje, cliente);

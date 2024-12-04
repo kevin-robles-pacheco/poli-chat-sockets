@@ -22,7 +22,7 @@ public class PaisDB {
             stmt.executeUpdate(insertQuery);
             return true;
         } catch (Exception e) {
-            mostrarTexto("Error al insertar empleado: " + e.getMessage());
+            mostrarTexto("Error al insertar pais: " + e.getMessage());
             return false;
         }
     }
